@@ -1,18 +1,30 @@
 import Task from "./Task.js";
 
 export default class {
-    constructor(element) {
-        this.storage_name = element.id;
-        this.form = element.querySelector('.formTask');
-        this.list = element.querySelector('.tasks');
-        this.tasks = [];
+    constructor(id = 0, element) {
+        this.storage_name = 'tasks-'+id;
+        this.todo = document.createElement('div');
+        this.form = document.createElement('form');
+        this.list = document.createElement('div');
+        this.tasks = [];      
 
-
+        // Creamos complete list
         this.completeList = document.createElement('div');
-        let title = document.createElement('h1').innerText = "Tareas Completadas"
+        let title = document.createElement('h1').innerText = "Completadas"
         this.completeList.classList.add("bg-gray-800", "rounded-md", "border-gray-200", "p-3", "mb-3")
-        element.append(this.completeList)
         this.completeList.append(title)
+        
+        // Creamos form
+        this.form.innerHTML = `<input type="text" name="task" placeholder="¿Qué vas a hacer hoy? ..."
+        class="mt-1 mb-3 w-full p-3 text-2xl rounded-md border-gray-200 shadow-sm dark:border-gray-700 dark:bg-gray-800 dark:text-white sm:text-sm" />`;
+        this.form.setAttribute('action', '#');
+        this.form.classList.add('formTask')
+
+        // Apendiamos todo
+        this.todo.append(this.list);
+        this.todo.append(this.form);
+        this.todo.append(this.completeList);
+        element.append(this.todo);
 
         this.form.addEventListener('submit', (event) => {
             const input = this.form.querySelector('input[name="task"]');
@@ -22,7 +34,16 @@ export default class {
             this.form.reset()
             event.preventDefault();
             return false;
-        })
+        });
+
+
+        // Creamos los task si es que hay
+        const loadTasks = this.getStorage();
+        if(loadTasks.length > 0) {
+            for(let i in loadTasks){
+                loadTasks[i]
+            }
+        }
     }
 
     addTask(value = '', completed = false) {
@@ -38,6 +59,7 @@ export default class {
 
         this.saveStorage()
     }
+
 
     completeTask(id, delay = 0) {
         const index = this.searchTaskById(id);
@@ -70,9 +92,7 @@ export default class {
     }
     removeTask(id) {
         const index = this.searchTaskById(id);
-
         delete this.tasks[index];
-
         this.saveStorage();
     }
 
@@ -87,10 +107,10 @@ export default class {
             })
         }
         
-        localStorage.setItem('tasks-' + this.storage_name, JSON.stringify(simplifyTask));
+        localStorage.setItem(this.storage_name, JSON.stringify(simplifyTask));
     }
     getStorage() {
-        let tasks = JSON.parse(localStorage.getItem('tasks-' + this.storage_name));
+        let tasks = JSON.parse(localStorage.getItem(this.storage_name));
         return tasks ? tasks : false;
     }
     changeCompleted(id) {
