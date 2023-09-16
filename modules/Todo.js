@@ -8,42 +8,9 @@ export default class {
         this.list = document.createElement('div');
         this.tasks = [];      
 
-        // Creamos complete list
-        this.completeList = document.createElement('div');
-        let title = document.createElement('h1').innerText = "Completadas"
-        this.completeList.classList.add("bg-gray-800", "rounded-md", "border-gray-200", "p-3", "mb-3")
-        this.completeList.append(title)
-        
-        // Creamos form
-        this.form.innerHTML = `<input type="text" name="task" placeholder="¿Qué vas a hacer hoy? ..."
-        class="mt-1 mb-3 w-full p-3 text-2xl rounded-md border-gray-200 shadow-sm dark:border-gray-700 dark:bg-gray-800 dark:text-white sm:text-sm" />`;
-        this.form.setAttribute('action', '#');
-        this.form.classList.add('formTask')
-
-        // Apendiamos todo
-        this.todo.append(this.list);
-        this.todo.append(this.form);
-        this.todo.append(this.completeList);
-        element.append(this.todo);
-
-        this.form.addEventListener('submit', (event) => {
-            const input = this.form.querySelector('input[name="task"]');
-
-            this.addTask(input.value);
-
-            this.form.reset()
-            event.preventDefault();
-            return false;
-        });
-
-
-        // Creamos los task si es que hay
-        const loadTasks = this.getStorage();
-        if(loadTasks.length > 0) {
-            for(let i in loadTasks){
-                loadTasks[i]
-            }
-        }
+        this.createDOMTodo(element);
+        this.formSubmitCreateTask();
+        this.loadTodoByStorage();
     }
 
     addTask(value = '', completed = false) {
@@ -117,5 +84,46 @@ export default class {
         let tasks = this.getStorage()
         const taskId = tasks.findIndex(task => task.id === id);
         tasks[taskId].completed = !tasks[taskId].completed;
+    }
+
+    createDOMTodo(element){
+        // Creamos complete list
+        this.completeList = document.createElement('div');
+        let title = document.createElement('h1').innerText = "Completadas"
+        this.completeList.classList.add("bg-gray-800", "rounded-md", "border-gray-200", "p-3", "mb-3")
+        this.completeList.append(title)
+        
+        // Creamos form
+        this.form.innerHTML = `<input type="text" name="task" placeholder="Agregar nuevo..."
+        class="mt-1 mb-3 w-full p-3 text-2xl rounded-md border-gray-200 shadow-sm dark:border-gray-700 dark:bg-gray-800 dark:text-white sm:text-sm" />`;
+        this.form.setAttribute('action', '#');
+        this.form.classList.add('formTask')
+
+        // Apendiamos todo
+        this.todo.append(this.list);
+        this.todo.append(this.form);
+        this.todo.append(this.completeList);
+        element.append(this.todo);
+    }
+
+    formSubmitCreateTask(){
+        this.form.addEventListener('submit', (event) => {
+            const input = this.form.querySelector('input[name="task"]');
+
+            this.addTask(input.value);
+
+            this.form.reset()
+            event.preventDefault();
+            return false;
+        });
+    }
+
+    loadTodoByStorage(){
+        const loadTasks = this.getStorage();
+        if(loadTasks.length > 0) {
+            for(let i in loadTasks){
+                this.addTask(loadTasks[i].name, loadTasks[i].completed)
+            }
+        }
     }
 }
